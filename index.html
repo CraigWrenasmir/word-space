@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Rhyme Space — explore words in 3D by sound &amp; meaning</title>
+<meta name="description" content="Type a word and explore its rhymes — or its meanings — as a colour-coded 3D constellation you can orbit, zoom and tap. A Universal Sandpit tool for classrooms.">
+<meta property="og:title" content="Rhyme Space">
+<meta property="og:description" content="Type a word and watch its rhymes — or its meanings — bloom into a 3D constellation you can orbit and explore.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://craigwrenasmir.github.io/word-space/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='%236b6b9d'/><circle cx='38' cy='40' r='7' fill='%23f3d33b'/><circle cx='62' cy='44' r='7' fill='%23c5366b'/><circle cx='50' cy='62' r='7' fill='%231b1c63'/></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  color-scheme: light;
+  --lavender:#9090c0; --lavender-deep:#6b6b9d;
+  --snes-red:#d64a4a; --snes-yellow:#e8c547; --snes-green:#5ab97a; --snes-blue:#5a7ec2;
+  --text-dark:#2a2a3a; --text-mid:#5a5a6a; --text-light:#8a8a9a;
+  --glass-bg:rgba(255,255,255,0.85); --glass-border:rgba(144,144,192,0.3);
+  --glass-shadow:rgba(107,107,157,0.15); --page-bg:#f6f6fb;
+}
+*{box-sizing:border-box;}
+html{overflow-x:hidden;max-width:100%;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+body{font-family:'Inter',sans-serif;margin:0;padding:20px;background:var(--page-bg);color:var(--text-dark);min-height:100vh;overflow-x:hidden;}
+.container{max-width:1000px;margin:0 auto;padding:32px 0;}
+.terminal-header{font-family:'Space Mono',monospace;color:var(--lavender-deep);text-align:center;margin-bottom:8px;font-size:13px;letter-spacing:2px;text-transform:uppercase;}
+h1{font-family:'Space Mono',monospace;text-align:center;color:var(--text-dark);font-size:1.7rem;margin:0 0 6px 0;font-weight:700;}
+.subtitle{text-align:center;font-family:'Space Mono',monospace;font-size:12px;color:var(--lavender-deep);letter-spacing:1px;margin:0 0 14px 0;}
+.tool-intro{text-align:center;max-width:660px;margin:0 auto 26px auto;font-size:14px;line-height:1.6;color:var(--text-mid);}
+.tool-intro strong{color:var(--text-dark);font-weight:600;}
+.panel{background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:12px;padding:24px;position:relative;box-shadow:0 4px 24px var(--glass-shadow),inset 0 1px 0 rgba(255,255,255,0.5);margin-bottom:22px;}
+.panel::before{content:"";position:absolute;top:0;left:20px;right:20px;height:4px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,var(--snes-red) 0%,var(--snes-red) 25%,var(--snes-yellow) 25%,var(--snes-yellow) 50%,var(--snes-green) 50%,var(--snes-green) 75%,var(--snes-blue) 75%,var(--snes-blue) 100%);opacity:0.85;}
+label.field-label{display:block;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-mid);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+label.field-label strong{color:var(--lavender-deep);}
+.mode-toggle{display:inline-flex;gap:0;border:1px solid var(--glass-border);border-radius:10px;overflow:hidden;margin-bottom:16px;background:white;}
+.mode-btn{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.5px;border:none;background:white;color:var(--text-mid);padding:9px 18px;cursor:pointer;transition:all .15s;}
+.mode-btn+.mode-btn{border-left:1px solid var(--glass-border);}
+.mode-btn:hover{color:var(--text-dark);}
+.mode-btn.active{background:var(--lavender-deep);color:white;}
+.input-row{display:flex;gap:10px;flex-wrap:wrap;}
+input[type="text"]{flex:1;min-width:180px;border:1px solid var(--glass-border);border-radius:8px;background:white;padding:12px 14px;font-family:'Inter',sans-serif;font-size:15px;color:var(--text-dark);}
+input[type="text"]:focus{outline:none;border-color:var(--lavender-deep);box-shadow:0 0 0 3px rgba(144,144,192,0.15);}
+button.btn{font-family:'Space Mono',monospace;font-weight:700;font-size:13px;letter-spacing:1px;text-transform:uppercase;border:none;border-radius:10px;padding:12px 22px;cursor:pointer;transition:all 0.15s;}
+button.btn-primary{background:var(--lavender-deep);color:white;}
+button.btn-primary:hover{background:var(--text-dark);}
+button.btn-primary:disabled{background:var(--text-light);cursor:not-allowed;}
+.examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;align-items:center;}
+.examples .lbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);margin-right:4px;}
+.chip{font-size:13px;font-family:'Inter',sans-serif;padding:5px 13px;border-radius:999px;border:1px solid var(--glass-border);background:white;color:var(--text-mid);cursor:pointer;transition:all 0.12s;user-select:none;}
+.chip:hover{border-color:var(--lavender-deep);color:var(--text-dark);}
+.status{text-align:center;font-family:'Space Mono',monospace;font-size:12px;color:var(--text-mid);letter-spacing:1px;margin:14px 0 4px;min-height:18px;}
+.status.error{color:var(--snes-red);font-weight:700;}
+
+/* Viewer */
+#viewer-panel{display:none;padding:0;overflow:hidden;}
+#viewer-panel.visible{display:block;animation:fadeIn 0.4s ease-out;}
+.viewer-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:18px 22px 10px;}
+.viewer-head h2{font-family:'Space Mono',monospace;font-size:1.05rem;color:var(--text-dark);margin:0;text-transform:uppercase;letter-spacing:1px;}
+.viewer-head h2 .word{color:var(--lavender-deep);}
+.viewer-head .count{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-light);}
+#stage-wrap{position:relative;width:100%;height:62vh;min-height:380px;background:#fcfcfe;border-top:1px solid var(--glass-border);border-bottom:1px solid var(--glass-border);overflow:hidden;touch-action:none;}
+#stage-wrap:fullscreen{width:100vw;height:100vh;border:none;}
+#stage-wrap:-webkit-full-screen{width:100vw;height:100vh;border:none;}
+#stage{position:absolute;inset:0;}
+.label2d{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-dark);text-shadow:0 1px 2px rgba(255,255,255,0.95),0 0 3px rgba(255,255,255,0.95);white-space:nowrap;pointer-events:none;transform:translate(-50%,-140%);transition:opacity .15s;}
+.label2d.query{font-size:13px;font-weight:700;color:var(--lavender-deep);}
+
+/* overlay legend */
+.legend{position:absolute;top:12px;left:12px;background:rgba(255,255,255,0.82);border:1px solid var(--glass-border);border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);font-family:'Space Mono',monospace;font-size:10px;color:var(--text-mid);max-width:160px;}
+.legend .ltitle{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);margin-bottom:6px;}
+.legend-row{display:flex;align-items:center;gap:7px;margin:3px 0;}
+.legend-dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,0.06);}
+.hint{position:absolute;bottom:10px;left:12px;font-family:'Space Mono',monospace;font-size:10px;color:var(--text-light);background:rgba(255,255,255,0.7);padding:4px 8px;border-radius:6px;}
+.zoombtns{position:absolute;bottom:12px;right:12px;display:flex;flex-direction:column;gap:6px;}
+.zoombtns button{width:36px;height:36px;border-radius:9px;border:1px solid var(--glass-border);background:rgba(255,255,255,0.92);color:var(--lavender-deep);font-family:'Space Mono',monospace;font-size:18px;line-height:1;cursor:pointer;backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:0;transition:all .12s;}
+.zoombtns button:hover{border-color:var(--lavender-deep);background:#fff;color:var(--text-dark);}
+.zoombtns button#zfit{font-size:15px;}
+
+/* readout */
+.readout{position:absolute;top:12px;right:12px;background:rgba(255,255,255,0.92);border:1px solid var(--glass-border);border-radius:10px;padding:12px 14px;backdrop-filter:blur(8px);min-width:170px;max-width:210px;opacity:0;transition:opacity .15s;pointer-events:none;}
+.readout.show{opacity:1;}
+.readout .rw{font-family:'Space Mono',monospace;font-weight:700;font-size:16px;color:var(--text-dark);}
+.readout .rp{font-family:'Space Mono',monospace;font-size:11px;color:var(--text-mid);margin:4px 0 8px;}
+.readout .rbar{height:7px;border-radius:4px;background:#eee;overflow:hidden;}
+.readout .rbar i{display:block;height:100%;}
+.readout .rscore{font-family:'Space Mono',monospace;font-size:10px;color:var(--text-light);margin-top:5px;letter-spacing:.5px;}
+.readout .rtap{font-family:'Space Mono',monospace;font-size:9px;color:var(--lavender-deep);margin-top:8px;letter-spacing:.5px;pointer-events:none;}
+
+/* controls bar */
+.ctrls{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:center;padding:12px 22px 18px;}
+.ctrl{display:flex;align-items:center;gap:8px;font-family:'Space Mono',monospace;font-size:11px;color:var(--text-mid);letter-spacing:.5px;text-transform:uppercase;}
+.ctrl input[type=range]{accent-color:var(--lavender-deep);}
+.ctrl button{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--glass-border);background:white;color:var(--lavender-deep);border-radius:8px;padding:6px 12px;cursor:pointer;}
+.ctrl button:hover{border-color:var(--lavender-deep);}
+.foot{text-align:center;font-family:'Space Mono',monospace;font-size:10px;color:var(--text-light);letter-spacing:.5px;margin-top:8px;line-height:1.7;}
+.foot a{color:var(--lavender-deep);text-decoration:none;}
+.spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--glass-border);border-top-color:var(--lavender-deep);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="terminal-header">Manifold Explorer</div>
+  <h1>Rhyme Space</h1>
+  <div class="subtitle">A 3D MAP OF HOW WORDS SOUND</div>
+  <p class="tool-intro">Type a word and watch a family of words bloom into a three‑dimensional cloud. Switch between <strong>Rhyme space</strong> — words sorted by how they <em>sound</em> — and <strong>Meaning space</strong> — words sorted by what they <em>mean</em> (so <em>whisper</em> lands nearer <em>murmur</em> than <em>scream</em>). The closest words sit at the dark‑blue core and drift out through purple and magenta to yellow at the far edges. Drag to orbit, scroll or pinch to zoom, and <strong>tap any word</strong> to set off exploring from there.</p>
+
+  <div class="panel">
+    <div class="mode-toggle" id="modeToggle">
+      <button class="mode-btn active" data-mode="rhyme">♪ Rhyme&nbsp;space</button>
+      <button class="mode-btn" data-mode="meaning">◇ Meaning&nbsp;space</button>
+    </div>
+    <label class="field-label" for="word" id="field-label">Enter a word — words that <strong>rhyme</strong> will map around it</label>
+    <div class="input-row">
+      <input type="text" id="word" placeholder="e.g. moon, orange, fire, learning…" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="btn btn-primary" id="go">Map it →</button>
+    </div>
+    <div class="examples">
+      <span class="lbl">Try:</span>
+      <span class="chip" data-w="moon">moon</span>
+      <span class="chip" data-w="fire">fire</span>
+      <span class="chip" data-w="learning">learning</span>
+      <span class="chip" data-w="ocean">ocean</span>
+      <span class="chip" data-w="star">star</span>
+      <span class="chip" data-w="dream">dream</span>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="panel" id="viewer-panel">
+    <div class="viewer-head">
+      <h2><span id="head-prefix">Rhymes with</span> <span class="word" id="head-word">—</span></h2>
+      <span class="count" id="head-count"></span>
+    </div>
+    <div id="stage-wrap">
+      <div id="stage"></div>
+      <div class="legend">
+        <div class="ltitle" id="leg-title">Rhyme quality</div>
+        <div class="legend-row"><span class="legend-dot" style="background:#1b1c63"></span> <span id="leg0">Perfect</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#6a2a86"></span> <span id="leg1">Strong</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#c5366b"></span> <span id="leg2">Near</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#f1743f"></span> <span id="leg3">Slant</span></div>
+        <div class="legend-row"><span class="legend-dot" style="background:#f3d33b"></span> <span id="leg4">Distant</span></div>
+      </div>
+      <div class="readout" id="readout">
+        <div class="rw" id="ro-word">—</div>
+        <div class="rp" id="ro-pron">—</div>
+        <div class="rbar"><i id="ro-bar"></i></div>
+        <div class="rscore" id="ro-score"></div>
+        <div class="rtap">tap point to re-map</div>
+      </div>
+      <div class="hint">drag to orbit · scroll / pinch to zoom · tap a word to explore</div>
+      <div class="zoombtns">
+        <button id="zfull" title="Full screen">⛶</button>
+        <button id="zin" title="Zoom in">+</button>
+        <button id="zout" title="Zoom out">−</button>
+        <button id="zfit" title="Fit all words">⤢</button>
+      </div>
+    </div>
+    <div class="ctrls">
+      <div class="ctrl"><span>Labels</span>
+        <input type="range" id="labelDensity" min="0" max="100" value="100">
+      </div>
+      <div class="ctrl"><button id="autorotate">Auto‑spin: off</button></div>
+      <div class="ctrl"><button id="reset">Reset view</button></div>
+      <div class="ctrl"><button id="copylink">Copy link</button></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    Pronunciation &amp; rhyme data from the free <a href="https://www.datamuse.com/api/" target="_blank" rel="noopener">Datamuse API</a>.
+    Layout by phonetic PCA · inspired by sparse‑autoencoder manifolds.<br>
+    A Universal Sandpit experiment.
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+}}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+/* ---------------- Phonetics ---------------- */
+const VOWELS = ['AA','AE','AH','AO','AW','AY','EH','ER','EY','IH','IY','OW','OY','UH','UW'];
+// vowel coords: [height, backness, rounding, rhotic]
+const VC = {
+  IY:[1.0,0.0,0,0], IH:[0.8,0.1,0,0], EY:[0.7,0.1,0,0], EH:[0.5,0.2,0,0], AE:[0.3,0.2,0,0],
+  AA:[0.1,0.6,0,0], AO:[0.4,0.8,1,0], OW:[0.6,0.8,1,0], UH:[0.8,0.8,1,0], UW:[1.0,0.9,1,0],
+  AH:[0.5,0.5,0,0], ER:[0.5,0.5,0,1], AW:[0.5,0.7,0.5,0], AY:[0.4,0.3,0,0], OY:[0.5,0.7,0.7,0]
+};
+// consonant classes
+const CCLASS = {};
+'P B T D K G'.split(' ').forEach(c=>CCLASS[c]='stop');
+'F V TH DH S Z SH ZH HH'.split(' ').forEach(c=>CCLASS[c]='fric');
+'CH JH'.split(' ').forEach(c=>CCLASS[c]='affr');
+'M N NG'.split(' ').forEach(c=>CCLASS[c]='nasal');
+CCLASS['L']='liquid'; CCLASS['R']='rhotic'; CCLASS['W']='glide'; CCLASS['Y']='glide';
+const CLASS_LIST=['stop','fric','affr','nasal','liquid','rhotic','glide','none'];
+const ALLPHONES=['AA','AE','AH','AO','AW','AY','B','CH','D','DH','EH','ER','EY','F','G','HH','IH','IY','JH','K','L','M','N','NG','OW','OY','P','R','S','SH','T','TH','UH','UW','V','W','Y','Z','ZH'];
+const PHIDX={}; ALLPHONES.forEach((p,i)=>PHIDX[p]=i);
+
+function stripStress(p){ return p.replace(/[0-9]/g,''); }
+function isVowel(p){ return VOWELS.includes(stripStress(p)); }
+
+// parse "pron:HH EH1 L OW0" -> ["HH","EH1","L","OW0"]
+function parsePron(tags){
+  if(!tags) return null;
+  const t = tags.find(x=>x.startsWith('pron:'));
+  if(!t) return null;
+  const ph = t.slice(5).trim().split(/\s+/).filter(Boolean);
+  return ph.length?ph:null;
+}
+
+// rhyme tail = from last primary-stressed vowel (fallback last vowel) to end
+function rhymeTail(ph){
+  let idx=-1;
+  for(let i=ph.length-1;i>=0;i--){ if(/1$/.test(ph[i])){ idx=i; break; } }
+  if(idx<0){ for(let i=ph.length-1;i>=0;i--){ if(isVowel(ph[i])){ idx=i; break; } } }
+  if(idx<0) idx=0;
+  return ph.slice(idx);
+}
+
+const MAXVD = 1.4; // normaliser for vowel distance
+function vowelDist(a,b){
+  const va=VC[stripStress(a)], vb=VC[stripStress(b)];
+  if(!va||!vb) return 1;
+  let s=0; for(let i=0;i<4;i++){ const w=(i===3?0.6:1); s+=w*(va[i]-vb[i])**2; }
+  return Math.min(1, Math.sqrt(s)/MAXVD);
+}
+// Normalise a rhyme tail: strip stress, and treat r-colouring written as the
+// vowel ER (after the nucleus) the same as the consonant R — so "fire" (AY ER)
+// and "lyre" (AY R) compare as identical.
+function normTail(tail){
+  return tail.map((p,i)=>{ const b=stripStress(p); return (i>0 && b==='ER') ? 'R' : b; });
+}
+// compare the coda sequences (everything after the stressed nucleus)
+function codaSeqSim(a,b){
+  const n=Math.max(a.length,b.length);
+  if(n===0) return 1;
+  let s=0;
+  for(let i=0;i<n;i++){
+    const x=a[i], y=b[i];
+    if(x===undefined||y===undefined) continue;       // length mismatch penalises
+    if(x===y) s+=1;
+    else if(CCLASS[x] && CCLASS[x]===CCLASS[y]) s+=0.55;
+  }
+  return s/n;
+}
+// 0..1, 1 = perfect rhyme. Stressed vowel dominates; coda sequence refines.
+function rhymeScore(qTailRaw,cTailRaw){
+  const q=normTail(qTailRaw), c=normTail(cTailRaw);
+  const vd=vowelDist(q[0],c[0]);
+  const cs=codaSeqSim(q.slice(1), c.slice(1));
+  let sc = 1 - (0.72*vd + 0.28*(1-cs));
+  return Math.max(0,Math.min(1,sc));
+}
+
+/* feature vector for layout */
+function classIndex(c){ const cl=CCLASS[c]||'none'; return CLASS_LIST.indexOf(cl); }
+function featureVec(ph){
+  const tail=rhymeTail(ph);
+  const v=VC[stripStress(tail[0])]||[0.5,0.5,0,0];
+  // whole-word phoneme histogram (lightly weighted toward the end) so that words
+  // sharing a rhyme tail still spread apart by their other sounds.
+  const hist=new Array(ALLPHONES.length).fill(0);
+  ph.forEach((p,k)=>{ const idx=PHIDX[stripStress(p)]; if(idx!==undefined){ hist[idx]+=0.6+0.4*(k/Math.max(1,ph.length-1)); } });
+  const syl=ph.filter(isVowel).length;
+  // NOTE: score is intentionally NOT included — it drives its own layout axis.
+  return [v[0]*1.2, v[1]*1.2, v[2], v[3], ...hist, syl*0.5];
+}
+
+/* ---------------- PCA ---------------- */
+function pca3(rows){
+  const n=rows.length, d=rows[0].length;
+  const mean=new Array(d).fill(0);
+  rows.forEach(r=>r.forEach((v,j)=>mean[j]+=v));
+  mean.forEach((_,j)=>mean[j]/=n);
+  const X=rows.map(r=>r.map((v,j)=>v-mean[j]));
+  // covariance d x d
+  const C=Array.from({length:d},()=>new Array(d).fill(0));
+  for(const r of X){ for(let i=0;i<d;i++){ const ri=r[i]; if(ri===0) continue; for(let j=i;j<d;j++){ C[i][j]+=ri*r[j]; } } }
+  for(let i=0;i<d;i++){ for(let j=i;j<d;j++){ C[i][j]/=n; C[j][i]=C[i][j]; } }
+  const comps=[];
+  let M=C.map(r=>r.slice());
+  for(let k=0;k<3;k++){
+    let v=new Array(d).fill(0).map((_,i)=>Math.sin(i*1.3+k*2.1)+0.5); // deterministic seed
+    for(let it=0;it<120;it++){
+      const nv=new Array(d).fill(0);
+      for(let i=0;i<d;i++){ let s=0; const Mi=M[i]; for(let j=0;j<d;j++) s+=Mi[j]*v[j]; nv[i]=s; }
+      let norm=Math.hypot(...nv)||1;
+      for(let i=0;i<d;i++) nv[i]/=norm;
+      v=nv;
+    }
+    // eigenvalue
+    let Mv=new Array(d).fill(0);
+    for(let i=0;i<d;i++){ let s=0; for(let j=0;j<d;j++) s+=M[i][j]*v[j]; Mv[i]=s; }
+    let lam=0; for(let i=0;i<d;i++) lam+=v[i]*Mv[i];
+    comps.push(v);
+    // deflate
+    for(let i=0;i<d;i++){ for(let j=0;j<d;j++){ M[i][j]-=lam*v[i]*v[j]; } }
+  }
+  // project
+  return X.map(r=>comps.map(c=>{ let s=0; for(let j=0;j<d;j++) s+=r[j]*c[j]; return s; }));
+}
+
+/* ---------------- Colour gradient (perfect score=1 -> distant score=0) ---------------- */
+const STOPS=[ // score, [r,g,b]
+  [1.00,[27,28,99]],   // dark blue
+  [0.78,[74,42,118]],  // deep purple
+  [0.55,[150,46,110]], // magenta
+  [0.38,[197,54,107]], // red/rose
+  [0.22,[241,116,63]], // orange
+  [0.00,[243,211,59]]  // yellow
+];
+function scoreColor(s){
+  s=Math.max(0,Math.min(1,s));
+  for(let i=0;i<STOPS.length-1;i++){
+    const a=STOPS[i], b=STOPS[i+1];
+    if(s<=a[0] && s>=b[0]){
+      const t=(a[0]-s)/((a[0]-b[0])||1);
+      return a[1].map((c,k)=>Math.round(c+(b[1][k]-c)*t));
+    }
+  }
+  return STOPS[STOPS.length-1][1];
+}
+
+/* ---------------- Datamuse fetch ---------------- */
+async function dm(params){
+  const url='https://api.datamuse.com/words?'+params;
+  const r=await fetch(url);
+  if(!r.ok) throw new Error('network');
+  return r.json();
+}
+const pronStr=ph=>'/ '+ph.map(stripStress).join(' ').toLowerCase()+' /';
+
+// RHYME mode: phonetic rhyme family, scored by rhyme quality, laid out by sound
+async function gatherRhyme(word){
+  word=word.trim().toLowerCase();
+  const [self,perf,near,like]=await Promise.all([
+    dm(`sp=${encodeURIComponent(word)}&md=r&max=1`),
+    dm(`rel_rhy=${encodeURIComponent(word)}&md=rsf&max=150`),
+    dm(`rel_nry=${encodeURIComponent(word)}&md=rsf&max=150`),
+    dm(`sl=${encodeURIComponent(word)}&md=rsf&max=80`)
+  ]);
+  const qpron = self[0] && parsePron(self[0].tags);
+  const map=new Map();
+  const add=arr=>arr.forEach(o=>{
+    const ph=parsePron(o.tags);
+    if(!ph) return;
+    if(o.word.toLowerCase()===word) return;
+    if(/[^a-z'\-]/.test(o.word)) return;
+    if(!map.has(o.word)) map.set(o.word,ph);
+  });
+  add(perf); add(near); add(like);
+  const qTail = qpron ? rhymeTail(qpron) : null;
+  let nodes=[...map.entries()].map(([w,ph])=>({
+    word:w, ph, sub:pronStr(ph),
+    score: qTail?rhymeScore(qTail,rhymeTail(ph)):0.5
+  }));
+  nodes.sort((a,b)=>b.score-a.score);
+  nodes=nodes.slice(0,140);
+  if(qpron) nodes.unshift({word, ph:qpron, score:1, isQuery:true, sub:pronStr(qpron)});
+  return {nodes, feats:nodes.map(o=>featureVec(o.ph))};
+}
+
+// MEANING mode: semantically related words. Layout uses a shared-neighbour
+// embedding — words that relate to the same other words sit close together.
+const POS_NAME={n:'noun',v:'verb',adj:'adjective',adv:'adverb',u:'word'};
+function defOf(o){
+  if(o.defs&&o.defs.length){ const p=o.defs[0].split('\t'); const d=(p[1]||p[0]||'').trim().replace(/\s+/g,' '); if(d) return d.length>96?d.slice(0,94)+'…':d; }
+  const pos=(o.tags||[]).find(t=>POS_NAME[t]); return pos?POS_NAME[pos]:'related word';
+}
+async function gatherMeaning(word){
+  word=word.trim().toLowerCase();
+  const base=await dm(`ml=${encodeURIComponent(word)}&max=70&md=dp`);
+  const clean=base.filter(o=>/^[a-z][a-z'’\-]*$/.test(o.word) && o.word!==word);
+  const top=clean.slice(0,42);
+  if(top.length<3) return {nodes:[],feats:[]};
+  // each word's own related set = its "neighbours"
+  const profs=await Promise.all(top.map(o=>
+    dm(`ml=${encodeURIComponent(o.word)}&max=24`).then(r=>r.map(x=>x.word.toLowerCase())).catch(()=>[])
+  ));
+  const queryProf=clean.map(o=>o.word.toLowerCase());
+  // vocabulary of neighbours shared by 2+ words (these define similarity)
+  const df=new Map();
+  [queryProf,...profs].forEach(p=>{ new Set(p).forEach(w=>df.set(w,(df.get(w)||0)+1)); });
+  const vocab=[...df.entries()].filter(([,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,260).map(e=>e[0]);
+  const vidx={}; vocab.forEach((w,i)=>vidx[w]=i);
+  const profVec=p=>{ const v=new Array(vocab.length).fill(0); new Set(p).forEach(w=>{ if(vidx[w]!==undefined) v[vidx[w]]=1; }); return v; };
+  const maxS=Math.max(...top.map(o=>o.score))||1;
+  // continuous closeness = cosine similarity of shared-neighbour fingerprints to the query.
+  // Datamuse's own relatedness score is coarsely banded, so on its own it gives only a few
+  // distinct colours; cosine varies smoothly and we blend the two.
+  const qv=profVec(queryProf);
+  const qn=Math.hypot.apply(null,qv)||1;
+  const cosq=v=>{ let dot=0,n=0; for(let k=0;k<v.length;k++){ dot+=v[k]*qv[k]; n+=v[k]*v[k]; } return dot/((Math.sqrt(n)||1)*qn); };
+  let nodes=top.map((o,i)=>{
+    const vec=profVec(profs[i]);
+    const rel=o.score/maxS;            // 0..1, banded
+    const cos=cosq(vec);               // 0..1, continuous
+    return { word:o.word.toLowerCase(), score:Math.max(0.05, 0.4*rel+0.6*cos), sub:defOf(o), _vec:vec };
+  });
+  nodes.sort((a,b)=>b.score-a.score);
+  nodes.unshift({word, score:1, isQuery:true, sub:'the word you mapped', _vec:qv});
+  return {nodes, feats:nodes.map(o=>o._vec)};
+}
+
+/* ---------------- Three.js scene ---------------- */
+let renderer,labelRenderer,scene,camera,controls,points,raycaster,pointer;
+let nodeData=[], labelObjs=[], queryMarker=null;
+let autoRotate=false, hoverIdx=-1;
+const stage=document.getElementById('stage');
+const stageWrap=document.getElementById('stage-wrap');
+
+function dotTexture(){
+  const c=document.createElement('canvas'); c.width=c.height=64;
+  const g=c.getContext('2d');
+  const grd=g.createRadialGradient(32,32,2,32,32,30);
+  grd.addColorStop(0,'rgba(255,255,255,1)');
+  grd.addColorStop(0.62,'rgba(255,255,255,1)');
+  grd.addColorStop(0.8,'rgba(255,255,255,0.5)');
+  grd.addColorStop(1,'rgba(255,255,255,0)');
+  g.fillStyle=grd; g.beginPath(); g.arc(32,32,30,0,7); g.fill();
+  const t=new THREE.CanvasTexture(c); t.needsUpdate=true; return t;
+}
+const DOT=dotTexture();
+
+function initScene(){
+  scene=new THREE.Scene(); scene.background=new THREE.Color(0xfcfcfe);
+  const w=stageWrap.clientWidth, h=stageWrap.clientHeight;
+  camera=new THREE.PerspectiveCamera(55,w/h,0.1,2000);
+  camera.position.set(0,0,150);
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(w,h); stage.appendChild(renderer.domElement);
+
+  labelRenderer=new CSS2DRenderer();
+  labelRenderer.setSize(w,h);
+  labelRenderer.domElement.style.position='absolute';
+  labelRenderer.domElement.style.top='0';
+  labelRenderer.domElement.style.pointerEvents='none';
+  stage.appendChild(labelRenderer.domElement);
+
+  controls=new OrbitControls(camera,renderer.domElement);
+  controls.enableDamping=true; controls.dampingFactor=0.08;
+  controls.rotateSpeed=0.8; controls.zoomSpeed=0.9;
+
+  raycaster=new THREE.Raycaster(); raycaster.params.Points.threshold=4;
+  pointer=new THREE.Vector2();
+
+  renderer.domElement.addEventListener('pointermove',onMove);
+  renderer.domElement.addEventListener('pointerdown',onDown);
+  window.addEventListener('resize',onResize);
+  animate();
+}
+
+function clearScene(){
+  if(points){ scene.remove(points); points.geometry.dispose(); points.material.dispose(); points=null; }
+  labelObjs.forEach(l=>scene.remove(l)); labelObjs=[];
+  if(queryMarker){ scene.remove(queryMarker); queryMarker=null; }
+  nodeData=[];
+}
+
+function buildScene(query, nodes){
+  clearScene();
+  onResize(); // panel is now visible — make sure renderer matches real size
+  nodeData=nodes;
+  const N=nodes.length;
+  const positions=new Float32Array(N*3);
+  const colors=new Float32Array(N*3);
+  nodes.forEach((n,i)=>{
+    positions[i*3]=n.pos[0]; positions[i*3+1]=n.pos[1]; positions[i*3+2]=n.pos[2];
+    const c=scoreColor(n.cscore!==undefined?n.cscore:n.score);
+    colors[i*3]=c[0]/255; colors[i*3+1]=c[1]/255; colors[i*3+2]=c[2]/255;
+    // label
+    const div=document.createElement('div');
+    div.className='label2d'+(n.isQuery?' query':'');
+    div.textContent=n.word;
+    const lo=new CSS2DObject(div);
+    lo.position.set(n.pos[0],n.pos[1],n.pos[2]);
+    lo.userData={i};
+    scene.add(lo); labelObjs.push(lo);
+  });
+  const geo=new THREE.BufferGeometry();
+  geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+  const mat=new THREE.PointsMaterial({size:6.5,map:DOT,vertexColors:true,transparent:true,
+    opacity:0.98,alphaTest:0.4,sizeAttenuation:true,depthWrite:false});
+  points=new THREE.Points(geo,mat); scene.add(points);
+
+  // query marker (ring + bright dot) at query node
+  const qn=nodes.find(n=>n.isQuery);
+  if(qn){
+    const grp=new THREE.Group();
+    const ring=new THREE.Mesh(new THREE.RingGeometry(7,8.4,40),
+      new THREE.MeshBasicMaterial({color:0x6b6b9d,side:THREE.DoubleSide,transparent:true,opacity:0.85}));
+    grp.add(ring);
+    grp.position.set(qn.pos[0],qn.pos[1],qn.pos[2]);
+    grp.userData.isRing=true;
+    scene.add(grp); queryMarker=grp;
+  }
+  frameCamera();
+}
+
+function frameCamera(){
+  const box=new THREE.Box3();
+  nodeData.forEach(n=>box.expandByPoint(new THREE.Vector3(...n.pos)));
+  const c=box.getCenter(new THREE.Vector3());
+  const size=box.getSize(new THREE.Vector3());
+  const radius=Math.max(size.x,size.y,size.z,30);
+  controls.target.copy(c);
+  camera.position.set(c.x+radius*0.4, c.y+radius*0.35, c.z+radius*1.7);
+  camera.near=0.1; camera.far=radius*30; camera.updateProjectionMatrix();
+  controls.update();
+}
+
+function onResize(){
+  const w=stageWrap.clientWidth, h=stageWrap.clientHeight;
+  camera.aspect=w/h; camera.updateProjectionMatrix();
+  renderer.setSize(w,h); labelRenderer.setSize(w,h);
+}
+
+function setPointer(e){
+  const r=renderer.domElement.getBoundingClientRect();
+  pointer.x=((e.clientX-r.left)/r.width)*2-1;
+  pointer.y=-((e.clientY-r.top)/r.height)*2+1;
+}
+function pick(){
+  if(!points) return -1;
+  raycaster.setFromCamera(pointer,camera);
+  const hits=raycaster.intersectObject(points);
+  if(hits.length){ return hits[0].index; }
+  return -1;
+}
+const MODES={
+  rhyme:{ prefix:'Rhymes with', legTitle:'Rhyme quality',
+    legend:['Perfect','Strong','Near','Slant','Distant'],
+    placeholder:'e.g. moon, orange, fire, learning…',
+    fieldLabel:'Enter a word — words that <strong>rhyme</strong> will map around it',
+    tier:s=> (s>0.92?'perfect':s>0.72?'strong':s>0.5?'near':s>0.3?'slant':'distant')+' rhyme · '+Math.round(s*100)+'%' },
+  meaning:{ prefix:'Meaning‑space of', legTitle:'Closeness in meaning',
+    legend:['Synonym','Close','Related','Loose','Distant'],
+    placeholder:'e.g. whisper, brave, ocean, kind…',
+    fieldLabel:'Enter a word — words with a similar <strong>meaning</strong> will map around it',
+    tier:s=> (s>0.85?'very close':s>0.6?'close':s>0.4?'related':s>0.22?'loosely related':'distant')+' · '+Math.round(s*100)+'% related' }
+};
+function applyModeChrome(){
+  const m=MODES[mode];
+  document.getElementById('head-prefix').textContent=m.prefix;
+  document.getElementById('leg-title').textContent=m.legTitle;
+  m.legend.forEach((t,i)=>document.getElementById('leg'+i).textContent=t);
+  wordInput.placeholder=m.placeholder;
+  document.getElementById('field-label').innerHTML=m.fieldLabel;
+}
+const readout=document.getElementById('readout');
+function showReadout(i){
+  const n=nodeData[i];
+  document.getElementById('ro-word').textContent=n.word;
+  document.getElementById('ro-pron').textContent=n.sub||'';
+  const c=scoreColor(n.cscore!==undefined?n.cscore:n.score);
+  const bar=document.getElementById('ro-bar');
+  bar.style.width=Math.round(n.score*100)+'%';
+  bar.style.background=`rgb(${c[0]},${c[1]},${c[2]})`;
+  document.getElementById('ro-score').textContent=n.isQuery?'your word':MODES[mode].tier(n.score);
+  readout.classList.add('show');
+}
+function onMove(e){
+  setPointer(e);
+  const i=pick();
+  hoverIdx=i;
+  renderer.domElement.style.cursor = i>=0?'pointer':'grab';
+  if(i>=0) showReadout(i); else readout.classList.remove('show');
+}
+let downXY=null;
+function onDown(e){ downXY=[e.clientX,e.clientY]; }
+renderer_addUp();
+function renderer_addUp(){
+  document.addEventListener('pointerup',e=>{
+    if(!downXY) return;
+    const moved=Math.hypot(e.clientX-downXY[0],e.clientY-downXY[1]);
+    downXY=null;
+    if(moved>6) return; // was a drag
+    setPointer(e); const i=pick();
+    if(i>=0){ const n=nodeData[i]; if(n && n.word){ document.getElementById('word').value=n.word; run(n.word); } }
+  });
+}
+
+let labelThreshold=0;
+const _v=new THREE.Vector3(), _camDir=new THREE.Vector3();
+function updateLabels(){
+  if(!labelObjs.length) return;
+  const w=stageWrap.clientWidth, h=stageWrap.clientHeight;
+  camera.getWorldDirection(_camDir);
+  // priority: query, then hovered, then strongest rhymes first
+  const order=labelObjs.slice().sort((a,b)=>{
+    const na=nodeData[a.userData.i], nb=nodeData[b.userData.i];
+    const pa=(na.isQuery?2:0)+(a.userData.i===hoverIdx?1:0);
+    const pb=(nb.isQuery?2:0)+(b.userData.i===hoverIdx?1:0);
+    if(pa!==pb) return pb-pa;
+    return nb.score-na.score;
+  });
+  const placed=[];
+  for(const lo of order){
+    const n=nodeData[lo.userData.i];
+    const el=lo.element;
+    const forced = n.isQuery || lo.userData.i===hoverIdx;
+    // density slider hides weak rhymes
+    if(n.score<labelThreshold && !forced){ el.style.opacity=0; continue; }
+    // cull labels behind the camera
+    _v.copy(lo.position).sub(camera.position);
+    if(_v.dot(_camDir)<=0){ el.style.opacity=0; continue; }
+    // project to screen + approximate text box
+    _v.copy(lo.position).project(camera);
+    const sx=(_v.x*0.5+0.5)*w, sy=(-_v.y*0.5+0.5)*h;
+    const tw=n.word.length*6.4+8, th=16;
+    const box={x:sx-tw/2,y:sy-th*1.4,w:tw,h:th};
+    let overlap=false;
+    for(const b of placed){ if(box.x<b.x+b.w&&box.x+box.w>b.x&&box.y<b.y+b.h&&box.y+box.h>b.y){overlap=true;break;} }
+    if(overlap && !forced){ el.style.opacity=0; continue; }
+    placed.push(box);
+    const d=camera.position.distanceTo(lo.position);
+    el.style.opacity = forced ? '1' : THREE.MathUtils.clamp(1.5-d/340,0.45,1).toFixed(2);
+  }
+}
+function animate(){
+  requestAnimationFrame(animate);
+  if(autoRotate && controls) controls.autoRotate=true; else if(controls) controls.autoRotate=false;
+  if(queryMarker) queryMarker.quaternion.copy(camera.quaternion);
+  controls && controls.update();
+  if(scene){ updateLabels(); renderer.render(scene,camera); labelRenderer.render(scene,camera); }
+}
+
+/* ---------------- Orchestration ---------------- */
+const statusEl=document.getElementById('status');
+const goBtn=document.getElementById('go');
+const wordInput=document.getElementById('word');
+let mode='rhyme';
+
+function setStatus(msg,err){ statusEl.innerHTML=msg; statusEl.className='status'+(err?' error':''); }
+
+async function run(word){
+  word=(word||'').trim().toLowerCase();
+  if(!word){ setStatus('Type a word first.',true); return; }
+  // reveal the viewer panel BEFORE initialising the renderer, so it gets a real size
+  document.getElementById('viewer-panel').classList.add('visible');
+  if(!scene) initScene();
+  goBtn.disabled=true;
+  setStatus('<span class="spinner"></span>'+(mode==='rhyme'
+    ? 'Listening for rhymes of “'+word+'”…'
+    : 'Tracing the meaning‑space of “'+word+'”…'));
+  try{
+    const {nodes,feats} = mode==='rhyme' ? await gatherRhyme(word) : await gatherMeaning(word);
+    if(nodes.length<3){
+      setStatus(mode==='rhyme'
+        ? 'Hmm, not many rhymes found for “'+word+'”. Try another word?'
+        : 'Not many related words found for “'+word+'”. Try a more common word?', true);
+      goBtn.disabled=false; return;
+    }
+    let scored=nodes; // already sorted, query first
+    // ---- colour: stretch palette across the score range actually present ----
+    // exclude the query anchor (always 1.0) so one outlier can't squash the gradient
+    const ss2=scored.filter(o=>!o.isQuery).map(o=>o.score).sort((a,b)=>a-b);
+    const pct=q=>ss2[Math.max(0,Math.min(ss2.length-1,Math.round(q*(ss2.length-1))))];
+    let clo=pct(0.02), chi=pct(0.98); if(chi-clo<0.12){ clo=Math.max(0,chi-0.12); }
+    scored.forEach(o=>{ o.cscore=Math.max(0,Math.min(1,(o.score-clo)/((chi-clo)||1))); });
+
+    // ---- layout ----
+    const coords=pca3(feats);
+    // normalise the free axes over NON-query words so the anchor can't distort or stretch the cloud
+    const nonQ=scored.map((o,i)=>i).filter(i=>!scored[i].isQuery);
+    const axisNorm=j=>{ let a=1e9,b=-1e9; nonQ.forEach(i=>{a=Math.min(a,coords[i][j]);b=Math.max(b,coords[i][j]);}); const sp=(b-a)||1; return v=>((v-a)/sp-0.5); };
+    const na=axisNorm(0), nb=axisNorm(1), nc=axisNorm(2);
+    const jit=(i,a)=>{ const s=Math.sin(i*12.9898+a*78.233)*43758.5453; return (s-Math.floor(s))-0.5; };
+    if(mode==='meaning'){
+      // RADIAL: the source word sits at the centre; related words orbit outward,
+      // with distance from the centre = how DIFFERENT in meaning (close words hug it).
+      scored.forEach((o,i)=>{
+        if(o.isQuery){ o.pos=[0,0,0]; return; }
+        let dx=na(coords[i][0]), dy=nb(coords[i][1]), dz=nc(coords[i][2]);
+        const len=Math.hypot(dx,dy,dz)||1;
+        const r=(1-o.cscore)*150+34;   // closest ~34 from centre, most distant ~184
+        o.pos=[ dx/len*r + jit(i,1)*14, dy/len*r + jit(i,2)*14, dz/len*r + jit(i,3)*14 ];
+      });
+    } else {
+      // LINEAR rhyme manifold: perfect rhymes at one end, distant echoes at the other
+      scored.forEach((o,i)=>{
+        o.pos=[ (o.cscore-0.5)*210 + jit(i,1)*26,
+                na(coords[i][0])*190 + jit(i,2)*26,
+                nb(coords[i][1])*190 + jit(i,3)*26 ];
+      });
+      const qNode=scored.find(o=>o.isQuery);
+      if(qNode && nonQ.length){
+        let sy=0,sz=0,mx=-1e9;
+        nonQ.forEach(i=>{ sy+=scored[i].pos[1]; sz+=scored[i].pos[2]; if(scored[i].pos[0]>mx) mx=scored[i].pos[0]; });
+        qNode.pos=[ mx+24, sy/nonQ.length, sz/nonQ.length ];
+      }
+    }
+    buildScene(word,scored);
+    applyModeChrome();
+    history.replaceState(null,'','?mode='+mode+'&word='+encodeURIComponent(word)); // shareable URL
+    document.getElementById('head-word').textContent=word;
+    document.getElementById('head-count').textContent=scored.length+' words';
+    setStatus('Mapped '+scored.length+(mode==='rhyme'?' rhyming words':' related words')+'. Drag to explore — tap a word to leap there.');
+    document.getElementById('viewer-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(err){
+    console.error(err);
+    setStatus('Something went wrong reaching the word dictionary. Check your connection and try again.',true);
+  }
+  goBtn.disabled=false;
+}
+
+/* events */
+goBtn.addEventListener('click',()=>run(wordInput.value));
+wordInput.addEventListener('keydown',e=>{ if(e.key==='Enter') run(wordInput.value); });
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{
+  wordInput.value=c.dataset.w; run(c.dataset.w);
+}));
+document.getElementById('labelDensity').addEventListener('input',e=>{
+  // slider 100 => show all (threshold 0); 0 => only top scoring
+  labelThreshold = 1 - (e.target.value/100);
+});
+document.getElementById('autorotate').addEventListener('click',e=>{
+  autoRotate=!autoRotate; e.target.textContent='Auto‑spin: '+(autoRotate?'on':'off');
+});
+document.getElementById('reset').addEventListener('click',()=>{ if(nodeData.length) frameCamera(); });
+function setMode(newMode){
+  if(newMode!=='rhyme'&&newMode!=='meaning') return;
+  mode=newMode;
+  document.querySelectorAll('.mode-btn').forEach(x=>x.classList.toggle('active',x.dataset.mode===mode));
+  const m=MODES[mode];
+  wordInput.placeholder=m.placeholder;
+  document.getElementById('field-label').innerHTML=m.fieldLabel;
+}
+document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>{
+  if(b.dataset.mode===mode) return;
+  setMode(b.dataset.mode);
+  if(wordInput.value.trim()) run(wordInput.value); // re-map current word in the new mode
+}));
+document.getElementById('copylink').addEventListener('click',e=>{
+  const btn=e.currentTarget, orig=btn.textContent;
+  navigator.clipboard.writeText(location.href).then(()=>{
+    btn.textContent='Copied!'; setTimeout(()=>btn.textContent=orig,1400);
+  }).catch(()=>{ btn.textContent='Copy failed'; setTimeout(()=>btn.textContent=orig,1400); });
+});
+
+// ---- share links: open straight to a word + mode, and keep the URL in sync ----
+(function initFromURL(){
+  const p=new URLSearchParams(location.search);
+  const pm=p.get('mode'); if(pm) setMode(pm);
+  const pw=p.get('word'); if(pw){ wordInput.value=pw; run(pw); }
+})();
+
+function zoomBy(f){
+  if(!controls) return;
+  const dir=camera.position.clone().sub(controls.target);
+  const len=dir.length(); const nl=THREE.MathUtils.clamp(len*f,8,1600);
+  camera.position.copy(controls.target).add(dir.multiplyScalar(nl/len));
+  controls.update();
+}
+document.getElementById('zin').addEventListener('click',()=>zoomBy(0.78));
+document.getElementById('zout').addEventListener('click',()=>zoomBy(1.28));
+document.getElementById('zfit').addEventListener('click',()=>{ if(nodeData.length) frameCamera(); });
+
+const fsEl=stageWrap;
+document.getElementById('zfull').addEventListener('click',()=>{
+  const fs=document.fullscreenElement||document.webkitFullscreenElement;
+  if(fs){ (document.exitFullscreen||document.webkitExitFullscreen).call(document); }
+  else{ (fsEl.requestFullscreen||fsEl.webkitRequestFullscreen).call(fsEl); }
+});
+function onFsChange(){
+  const fs=document.fullscreenElement||document.webkitFullscreenElement;
+  document.getElementById('zfull').textContent = fs?'⤡':'⛶';
+  // let the layout settle, then resize the renderer to the new size
+  setTimeout(onResize,60);
+}
+document.addEventListener('fullscreenchange',onFsChange);
+document.addEventListener('webkitfullscreenchange',onFsChange);
+</script>
+</body>
+</html>
