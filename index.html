@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Word Space — explore words in 3D by sound &amp; meaning</title>
-<meta name="description" content="Type a word and explore its rhymes — or its meanings — as a colour-coded 3D constellation you can orbit, zoom and tap. A Universal Sandpit tool for classrooms.">
+<meta name="description" content="Type a word and explore its rhymes — or its meanings — as a colour-coded 3D constellation you can orbit, zoom and tap. Meaning space is computed by a real neural network running in your browser. A Universal Sandpit tool for classrooms.">
 <meta property="og:title" content="Word Space">
 <meta property="og:description" content="Type a word and watch its rhymes — or its meanings — bloom into a 3D constellation you can orbit and explore.">
 <meta property="og:type" content="website">
@@ -103,6 +103,61 @@ button.btn-primary:disabled{background:var(--text-light);cursor:not-allowed;}
 .foot a{color:var(--lavender-deep);text-decoration:none;}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid var(--glass-border);border-top-color:var(--lavender-deep);border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+/* custom axes (meaning mode) */
+.axes-row{display:none;margin-top:16px;padding-top:14px;border-top:1px dashed var(--glass-border);}
+.axes-row.visible{display:block;}
+.axes-row .axline{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.axes-row .axname{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--lavender-deep);width:14px;}
+.axes-row input[type=text]{flex:0 1 150px;min-width:110px;padding:8px 10px;font-size:13px;}
+.axes-row .axarrow{font-family:'Space Mono',monospace;color:var(--text-light);}
+.axes-row .axhint{font-size:12px;color:var(--text-light);margin-top:6px;}
+
+/* pole labels at the ends of custom axes */
+.label2d.pole{font-size:12px;font-weight:700;color:var(--snes-red);text-transform:uppercase;letter-spacing:1px;}
+
+/* readout actions */
+.readout{pointer-events:auto;}
+.readout.show{pointer-events:auto;}
+.readout:not(.show){pointer-events:none;}
+.readout .racts{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;}
+.readout .racts button{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--glass-border);background:white;color:var(--lavender-deep);border-radius:7px;padding:5px 8px;cursor:pointer;}
+.readout .racts button:hover{border-color:var(--lavender-deep);color:var(--text-dark);}
+.readout .rwhy{font-family:'Inter',sans-serif;font-size:11.5px;line-height:1.45;color:var(--text-mid);margin-top:8px;display:none;}
+.readout .rwhy.show{display:block;}
+
+/* word basket + poem */
+.basket-bar{display:none;flex-wrap:wrap;align-items:center;gap:8px;padding:0 22px 16px;}
+.basket-bar.visible{display:flex;}
+.basket-bar .blbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-light);}
+.basket-chip{font-size:12.5px;padding:4px 10px;border-radius:999px;border:1px solid var(--lavender);background:white;color:var(--text-dark);display:inline-flex;align-items:center;gap:6px;}
+.basket-chip b{font-weight:400;}
+.basket-chip .x{cursor:pointer;color:var(--text-light);font-family:'Space Mono',monospace;font-size:11px;}
+.basket-chip .x:hover{color:var(--snes-red);}
+.basket-bar button{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--glass-border);background:white;color:var(--lavender-deep);border-radius:8px;padding:6px 11px;cursor:pointer;}
+.basket-bar button:hover{border-color:var(--lavender-deep);}
+.basket-bar button.weave{background:var(--lavender-deep);color:white;border-color:var(--lavender-deep);}
+.basket-bar button.weave:hover{background:var(--text-dark);}
+.poem-panel{display:none;margin:0 22px 18px;padding:16px 18px;border:1px solid var(--glass-border);border-radius:10px;background:rgba(255,255,255,0.7);}
+.poem-panel.visible{display:block;animation:fadeIn .3s ease-out;}
+.poem-panel h3{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--lavender-deep);margin:0 0 8px;}
+.poem-panel pre{font-family:'Inter',sans-serif;font-size:14.5px;line-height:1.7;color:var(--text-dark);white-space:pre-wrap;margin:0;}
+.poem-panel .pacts{margin-top:10px;display:flex;gap:8px;}
+.poem-panel .pacts button{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.5px;text-transform:uppercase;border:1px solid var(--glass-border);background:white;color:var(--lavender-deep);border-radius:8px;padding:6px 11px;cursor:pointer;}
+
+/* print view */
+#printview{display:none;}
+@media print{
+  body{padding:0;background:white;}
+  .container{display:none;}
+  #printview{display:block;font-family:'Inter',sans-serif;color:#111;padding:10mm;}
+  #printview h1{font-family:'Space Mono',monospace;font-size:20pt;margin:0 0 2mm;}
+  #printview .pmeta{font-family:'Space Mono',monospace;font-size:9pt;color:#555;margin-bottom:6mm;}
+  #printview h2{font-family:'Space Mono',monospace;font-size:11pt;margin:5mm 0 2mm;border-bottom:1px solid #ccc;padding-bottom:1mm;}
+  #printview .pword{font-size:10.5pt;margin:1.2mm 0;}
+  #printview .pword .psub{color:#666;font-size:8.5pt;margin-left:2mm;}
+  #printview .pfoot{margin-top:8mm;font-family:'Space Mono',monospace;font-size:8pt;color:#777;}
+}
 </style>
 </head>
 <body>
@@ -110,7 +165,7 @@ button.btn-primary:disabled{background:var(--text-light);cursor:not-allowed;}
   <div class="terminal-header">Manifold Explorer</div>
   <h1>Word Space</h1>
   <div class="subtitle">EXPLORE WORDS IN 3D — BY SOUND &amp; BY MEANING</div>
-  <p class="tool-intro">Type a word and watch a family of words bloom into a three‑dimensional cloud. Switch between <strong>Rhyme space</strong> — words sorted by how they <em>sound</em> — and <strong>Meaning space</strong> — words sorted by what they <em>mean</em> (so <em>whisper</em> lands nearer <em>murmur</em> than <em>scream</em>). The closest words sit at the dark‑blue core and drift out through purple and magenta to yellow at the far edges. Drag to orbit, scroll or pinch to zoom, and <strong>tap any word</strong> to set off exploring from there.</p>
+  <p class="tool-intro">Type a word and watch a family of words bloom into a three‑dimensional cloud. Switch between <strong>Rhyme space</strong> — words sorted by how they <em>sound</em> — and <strong>Meaning space</strong> — words placed by a real neural network running <em>in your browser</em>, so <em>whisper</em> lands nearer <em>murmur</em> than <em>scream</em>. In Meaning space you can even name your own <strong>axes</strong> (try <em>hot ↔ cold</em>) and watch the words line up along them. Drag to orbit, scroll or pinch to zoom, and <strong>tap any word</strong> to ask why it's there, collect it, or leap off exploring from it.</p>
 
   <div class="panel">
     <div class="mode-toggle" id="modeToggle">
@@ -130,6 +185,22 @@ button.btn-primary:disabled{background:var(--text-light);cursor:not-allowed;}
       <span class="chip" data-w="ocean">ocean</span>
       <span class="chip" data-w="star">star</span>
       <span class="chip" data-w="dream">dream</span>
+    </div>
+    <div class="axes-row" id="axesRow">
+      <label class="field-label">Custom axes — name two opposite poles and words will line up between them</label>
+      <div class="axline">
+        <span class="axname">X</span>
+        <input type="text" id="axXa" placeholder="e.g. cold" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <span class="axarrow">↔</span>
+        <input type="text" id="axXb" placeholder="e.g. hot" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="axline">
+        <span class="axname">Y</span>
+        <input type="text" id="axYa" placeholder="e.g. gentle" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <span class="axarrow">↔</span>
+        <input type="text" id="axYb" placeholder="e.g. fierce" autocomplete="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <div class="axhint">Leave blank for the automatic layout. Fill an axis and press <strong>Map it</strong> again.</div>
     </div>
     <div class="status" id="status"></div>
   </div>
@@ -154,9 +225,14 @@ button.btn-primary:disabled{background:var(--text-light);cursor:not-allowed;}
         <div class="rp" id="ro-pron">—</div>
         <div class="rbar"><i id="ro-bar"></i></div>
         <div class="rscore" id="ro-score"></div>
-        <div class="rtap">tap point to re-map</div>
+        <div class="racts" id="ro-acts">
+          <button id="ro-map">Map it →</button>
+          <button id="ro-why">Why?</button>
+          <button id="ro-collect">＋ Collect</button>
+        </div>
+        <div class="rwhy" id="ro-whytext"></div>
       </div>
-      <div class="hint">drag to orbit · scroll / pinch to zoom · tap a word to explore</div>
+      <div class="hint">drag to orbit · scroll / pinch to zoom · tap a word for options</div>
       <div class="zoombtns">
         <button id="zfull" title="Full screen">⛶</button>
         <button id="zin" title="Zoom in">+</button>
@@ -171,15 +247,35 @@ button.btn-primary:disabled{background:var(--text-light);cursor:not-allowed;}
       <div class="ctrl"><button id="autorotate">Auto‑spin: off</button></div>
       <div class="ctrl"><button id="reset">Reset view</button></div>
       <div class="ctrl"><button id="copylink">Copy link</button></div>
+      <div class="ctrl"><button id="savepng">Save picture</button></div>
+      <div class="ctrl"><button id="printlist">Print word list</button></div>
+    </div>
+    <div class="basket-bar" id="basketBar">
+      <span class="blbl">Word basket:</span>
+      <span id="basketChips"></span>
+      <button class="weave" id="weavePoem">✎ Weave a poem</button>
+      <button id="clearBasket">Clear</button>
+    </div>
+    <div class="poem-panel" id="poemPanel">
+      <h3 id="poemTitle">Your poem</h3>
+      <pre id="poemText"></pre>
+      <div class="pacts">
+        <button id="copyPoem">Copy poem</button>
+        <button id="closePoem">Close</button>
+      </div>
     </div>
   </div>
 
   <div class="foot">
     Pronunciation &amp; rhyme data from the free <a href="https://www.datamuse.com/api/" target="_blank" rel="noopener">Datamuse API</a>.
-    Layout by phonetic PCA · inspired by sparse‑autoencoder manifolds.<br>
+    Meaning space is computed on your device by a small neural network (<a href="https://huggingface.co/Xenova/all-MiniLM-L6-v2" target="_blank" rel="noopener">MiniLM</a> via transformers.js) — nothing you type leaves your browser to be mapped.<br>
+    Rhyme layout by phonetic PCA · inspired by sparse‑autoencoder manifolds · Word Wizard answers via the Universal Sandpit server.<br>
+    Pronunciations are American English, so the odd rhyme may land differently in an Australian accent.<br>
     A Universal Sandpit experiment.
   </div>
 </div>
+
+<div id="printview"></div>
 
 <script type="importmap">
 { "imports": {
@@ -346,6 +442,55 @@ async function dm(params){
 }
 const pronStr=ph=>'/ '+ph.map(stripStress).join(' ').toLowerCase()+' /';
 
+/* ---------------- In-browser embeddings (transformers.js + MiniLM) ----------------
+   Meaning space uses a real sentence-transformer running on-device. The model is
+   fetched once (~25 MB, cached by the browser) then every lookup is local. */
+const TJS_URL='https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0/dist/transformers.min.js';
+let _extractorPromise=null, _embedReady=false;
+const embCache=new Map();
+function getExtractor(){
+  if(!_extractorPromise){
+    _extractorPromise=(async()=>{
+      const {pipeline}=await import(TJS_URL);
+      const ex=await pipeline('feature-extraction','Xenova/all-MiniLM-L6-v2',{
+        dtype:'q8',
+        progress_callback:p=>{
+          if(p.status==='progress' && p.file && /onnx/.test(p.file)){
+            setStatus('<span class="spinner"></span>First visit: fetching the meaning model — '+Math.round(p.progress||0)+'% (one-time, then it lives in your browser)');
+          }
+        }
+      });
+      _embedReady=true;
+      return ex;
+    })().catch(err=>{ console.warn('embeddings unavailable:',err); _extractorPromise=Promise.resolve(null); return null; });
+  }
+  return _extractorPromise;
+}
+// embed a list of words -> array of Float32Array (unit-normalised), or null if unavailable
+async function embedWords(words){
+  const ex=await getExtractor();
+  if(!ex) return null;
+  const todo=words.filter(w=>!embCache.has(w));
+  for(let i=0;i<todo.length;i+=32){                     // small batches keep the UI responsive
+    const chunk=todo.slice(i,i+32);
+    const out=await ex(chunk,{pooling:'mean',normalize:true});
+    const d=out.dims[out.dims.length-1];
+    chunk.forEach((w,k)=>embCache.set(w,out.data.slice(k*d,(k+1)*d)));
+  }
+  return words.map(w=>embCache.get(w));
+}
+const dotv=(a,b)=>{ let s=0; for(let i=0;i<a.length;i++) s+=a[i]*b[i]; return s; };
+
+/* ---------------- Word Wizard backend (explanations & poems) ---------------- */
+const API_BASE=(location.hostname==='localhost'||location.hostname==='127.0.0.1')
+  ? 'http://127.0.0.1:5001' : 'https://tools.theuniversalsandpit.org';
+async function wizard(path,payload){
+  const r=await fetch(API_BASE+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(j.error||'wizard unavailable');
+  return j;
+}
+
 // RHYME mode: phonetic rhyme family, scored by rhyme quality, laid out by sound
 async function gatherRhyme(word){
   word=word.trim().toLowerCase();
@@ -376,14 +521,39 @@ async function gatherRhyme(word){
   return {nodes, feats:nodes.map(o=>featureVec(o.ph))};
 }
 
-// MEANING mode: semantically related words. Layout uses a shared-neighbour
-// embedding — words that relate to the same other words sit close together.
+// MEANING mode: candidate words come from Datamuse, but closeness and layout
+// come from REAL semantic vectors computed on-device by MiniLM.
 const POS_NAME={n:'noun',v:'verb',adj:'adjective',adv:'adverb',u:'word'};
 function defOf(o){
   if(o.defs&&o.defs.length){ const p=o.defs[0].split('\t'); const d=(p[1]||p[0]||'').trim().replace(/\s+/g,' '); if(d) return d.length>96?d.slice(0,94)+'…':d; }
   const pos=(o.tags||[]).find(t=>POS_NAME[t]); return pos?POS_NAME[pos]:'related word';
 }
 async function gatherMeaning(word){
+  word=word.trim().toLowerCase();
+  const base=await dm(`ml=${encodeURIComponent(word)}&max=90&md=dp`);
+  const clean=base.filter(o=>/^[a-z][a-z'’\-]*$/.test(o.word) && o.word!==word);
+  const top=clean.slice(0,60);
+  if(top.length<3) return {nodes:[],feats:[]};
+  setStatus('<span class="spinner"></span>Thinking about what “'+word+'” means…');
+  const vecs=await embedWords([word,...top.map(o=>o.word.toLowerCase())]);
+  if(!vecs||vecs.some(v=>!v)) return gatherMeaningClassic(word);   // offline / model blocked
+  const qv=vecs[0];
+  const cos=top.map((o,i)=>dotv(qv,vecs[i+1]));
+  // spread this word-set's raw cosines over the full 0–1 range (robust to outliers)
+  const sorted=cos.slice().sort((a,b)=>a-b);
+  const lo=sorted[Math.floor(0.03*(sorted.length-1))], hi=sorted[Math.ceil(0.97*(sorted.length-1))];
+  const span=(hi-lo)||1;
+  let nodes=top.map((o,i)=>({
+    word:o.word.toLowerCase(), sub:defOf(o),
+    score:Math.max(0.03,Math.min(0.97,(cos[i]-lo)/span)),
+    _vec:vecs[i+1]
+  }));
+  nodes.sort((a,b)=>b.score-a.score);
+  nodes.unshift({word, score:1, isQuery:true, sub:'the word you mapped', _vec:qv});
+  return {nodes, feats:nodes.map(o=>Array.from(o._vec))};
+}
+// Fallback when the neural model can't load: the original shared-neighbour trick.
+async function gatherMeaningClassic(word){
   word=word.trim().toLowerCase();
   const base=await dm(`ml=${encodeURIComponent(word)}&max=70&md=dp`);
   const clean=base.filter(o=>/^[a-z][a-z'’\-]*$/.test(o.word) && o.word!==word);
@@ -420,8 +590,25 @@ async function gatherMeaning(word){
 
 /* ---------------- Three.js scene ---------------- */
 let renderer,labelRenderer,scene,camera,controls,points,raycaster,pointer;
-let nodeData=[], labelObjs=[], queryMarker=null;
-let autoRotate=false, hoverIdx=-1;
+let nodeData=[], labelObjs=[], poleObjs=[], queryMarker=null, pendingPoles=[];
+let autoRotate=false, hoverIdx=-1, pinnedIdx=-1, roIdx=-1, currentWord='';
+
+// read the custom-axis inputs; an axis counts only when BOTH poles are filled
+async function resolveAxes(){
+  const pair=async(ida,idb)=>{
+    const a=(document.getElementById(ida).value||'').trim().toLowerCase();
+    const b=(document.getElementById(idb).value||'').trim().toLowerCase();
+    if(!a||!b||a===b) return null;
+    const v=await embedWords([a,b]);
+    if(!v||!v[0]||!v[1]) return null;
+    const ax=new Float32Array(v[0].length);
+    let n=0; for(let i=0;i<ax.length;i++){ ax[i]=v[1][i]-v[0][i]; n+=ax[i]*ax[i]; }
+    n=Math.sqrt(n)||1; for(let i=0;i<ax.length;i++) ax[i]/=n;
+    return {a,b,vec:ax};
+  };
+  const [x,y]=await Promise.all([pair('axXa','axXb'),pair('axYa','axYb')]);
+  return (x||y)?{x,y}:null;
+}
 const stage=document.getElementById('stage');
 const stageWrap=document.getElementById('stage-wrap');
 
@@ -470,8 +657,10 @@ function initScene(){
 function clearScene(){
   if(points){ scene.remove(points); points.geometry.dispose(); points.material.dispose(); points=null; }
   labelObjs.forEach(l=>scene.remove(l)); labelObjs=[];
+  poleObjs.forEach(l=>scene.remove(l)); poleObjs=[];
   if(queryMarker){ scene.remove(queryMarker); queryMarker=null; }
-  nodeData=[];
+  nodeData=[]; pinnedIdx=-1; roIdx=-1;
+  readout.classList.remove('show');
 }
 
 function buildScene(query, nodes){
@@ -500,6 +689,15 @@ function buildScene(query, nodes){
   const mat=new THREE.PointsMaterial({size:6.5,map:DOT,vertexColors:true,transparent:true,
     opacity:0.98,alphaTest:0.4,sizeAttenuation:true,depthWrite:false});
   points=new THREE.Points(geo,mat); scene.add(points);
+
+  // pole labels for custom axes
+  pendingPoles.forEach(p=>{
+    const div=document.createElement('div');
+    div.className='label2d pole'; div.textContent=p.text;
+    const lo=new CSS2DObject(div);
+    lo.position.set(p.pos[0],p.pos[1],p.pos[2]);
+    scene.add(lo); poleObjs.push(lo);
+  });
 
   // query marker (ring + bright dot) at query node
   const qn=nodes.find(n=>n.isQuery);
@@ -550,11 +748,13 @@ const MODES={
     legend:['Perfect','Strong','Near','Slant','Distant'],
     placeholder:'e.g. moon, orange, fire, learning…',
     fieldLabel:'Enter a word — words that <strong>rhyme</strong> will map around it',
+    bands:[0.92,0.72,0.5,0.3],
     tier:s=> (s>0.92?'perfect':s>0.72?'strong':s>0.5?'near':s>0.3?'slant':'distant')+' rhyme · '+Math.round(s*100)+'%' },
   meaning:{ prefix:'Meaning‑space of', legTitle:'Closeness in meaning',
     legend:['Synonym','Close','Related','Loose','Distant'],
     placeholder:'e.g. whisper, brave, ocean, kind…',
     fieldLabel:'Enter a word — words with a similar <strong>meaning</strong> will map around it',
+    bands:[0.85,0.6,0.4,0.22],
     tier:s=> (s>0.85?'very close':s>0.6?'close':s>0.4?'related':s>0.22?'loosely related':'distant')+' · '+Math.round(s*100)+'% related' }
 };
 function applyModeChrome(){
@@ -568,6 +768,7 @@ function applyModeChrome(){
 const readout=document.getElementById('readout');
 function showReadout(i){
   const n=nodeData[i];
+  roIdx=i;
   document.getElementById('ro-word').textContent=n.word;
   document.getElementById('ro-pron').textContent=n.sub||'';
   const c=scoreColor(n.cscore!==undefined?n.cscore:n.score);
@@ -575,6 +776,10 @@ function showReadout(i){
   bar.style.width=Math.round(n.score*100)+'%';
   bar.style.background=`rgb(${c[0]},${c[1]},${c[2]})`;
   document.getElementById('ro-score').textContent=n.isQuery?'your word':MODES[mode].tier(n.score);
+  document.getElementById('ro-map').style.display=n.isQuery?'none':'';
+  document.getElementById('ro-why').style.display=n.isQuery?'none':'';
+  const why=document.getElementById('ro-whytext');
+  why.classList.remove('show'); why.textContent='';
   readout.classList.add('show');
 }
 function onMove(e){
@@ -582,6 +787,7 @@ function onMove(e){
   const i=pick();
   hoverIdx=i;
   renderer.domElement.style.cursor = i>=0?'pointer':'grab';
+  if(pinnedIdx>=0) return;                 // a tapped word stays up until you tap elsewhere
   if(i>=0) showReadout(i); else readout.classList.remove('show');
 }
 let downXY=null;
@@ -594,7 +800,8 @@ function renderer_addUp(){
     downXY=null;
     if(moved>6) return; // was a drag
     setPointer(e); const i=pick();
-    if(i>=0){ const n=nodeData[i]; if(n && n.word){ document.getElementById('word').value=n.word; run(n.word); } }
+    if(i>=0){ pinnedIdx=i; showReadout(i); }
+    else{ pinnedIdx=-1; readout.classList.remove('show'); }
   });
 }
 
@@ -607,8 +814,8 @@ function updateLabels(){
   // priority: query, then hovered, then strongest rhymes first
   const order=labelObjs.slice().sort((a,b)=>{
     const na=nodeData[a.userData.i], nb=nodeData[b.userData.i];
-    const pa=(na.isQuery?2:0)+(a.userData.i===hoverIdx?1:0);
-    const pb=(nb.isQuery?2:0)+(b.userData.i===hoverIdx?1:0);
+    const pa=(na.isQuery?2:0)+(a.userData.i===hoverIdx||a.userData.i===pinnedIdx?1:0);
+    const pb=(nb.isQuery?2:0)+(b.userData.i===hoverIdx||b.userData.i===pinnedIdx?1:0);
     if(pa!==pb) return pb-pa;
     return nb.score-na.score;
   });
@@ -616,7 +823,7 @@ function updateLabels(){
   for(const lo of order){
     const n=nodeData[lo.userData.i];
     const el=lo.element;
-    const forced = n.isQuery || lo.userData.i===hoverIdx;
+    const forced = n.isQuery || lo.userData.i===hoverIdx || lo.userData.i===pinnedIdx;
     // density slider hides weak rhymes
     if(n.score<labelThreshold && !forced){ el.style.opacity=0; continue; }
     // cull labels behind the camera
@@ -684,16 +891,35 @@ async function run(word){
     const axisNorm=j=>{ let a=1e9,b=-1e9; nonQ.forEach(i=>{a=Math.min(a,coords[i][j]);b=Math.max(b,coords[i][j]);}); const sp=(b-a)||1; return v=>((v-a)/sp-0.5); };
     const na=axisNorm(0), nb=axisNorm(1), nc=axisNorm(2);
     const jit=(i,a)=>{ const s=Math.sin(i*12.9898+a*78.233)*43758.5453; return (s-Math.floor(s))-0.5; };
+    pendingPoles=[];
     if(mode==='meaning'){
-      // RADIAL: the source word sits at the centre; related words orbit outward,
-      // with distance from the centre = how DIFFERENT in meaning (close words hug it).
-      scored.forEach((o,i)=>{
-        if(o.isQuery){ o.pos=[0,0,0]; return; }
-        let dx=na(coords[i][0]), dy=nb(coords[i][1]), dz=nc(coords[i][2]);
-        const len=Math.hypot(dx,dy,dz)||1;
-        const r=(1-o.cscore)*150+34;   // closest ~34 from centre, most distant ~184
-        o.pos=[ dx/len*r + jit(i,1)*14, dy/len*r + jit(i,2)*14, dz/len*r + jit(i,3)*14 ];
-      });
+      const axes = scored[0]&&scored[0]._vec ? await resolveAxes() : null;
+      if(axes){
+        // CUSTOM AXES: each word's position along an axis = the projection of its
+        // semantic vector onto the direction between the two poles the student named.
+        const spanFn=vals=>{ const a=Math.min(...vals), b=Math.max(...vals); const sp=(b-a)||1; return v=>((v-a)/sp-0.5)*300; };
+        const xs=axes.x?scored.map(o=>dotv(o._vec,axes.x.vec)):null;
+        const ys=axes.y?scored.map(o=>dotv(o._vec,axes.y.vec)):null;
+        const nx=xs?spanFn(xs):null, ny=ys?spanFn(ys):null;
+        scored.forEach((o,i)=>{
+          const px=xs?nx(xs[i]):na(coords[i][0])*170;
+          const py=ys?ny(ys[i]):nb(coords[i][1])*140;
+          const pz=nc(coords[i][2])*90;
+          o.pos=[ px+jit(i,1)*6, py+jit(i,2)*6, pz+jit(i,3)*8 ];
+        });
+        if(axes.x) pendingPoles.push({text:'← '+axes.x.a,pos:[-172,0,0]},{text:axes.x.b+' →',pos:[172,0,0]});
+        if(axes.y) pendingPoles.push({text:axes.y.a+' ↓',pos:[0,-172,0]},{text:'↑ '+axes.y.b,pos:[0,172,0]});
+      }else{
+        // RADIAL: the source word sits at the centre; related words orbit outward,
+        // with distance from the centre = how DIFFERENT in meaning (close words hug it).
+        scored.forEach((o,i)=>{
+          if(o.isQuery){ o.pos=[0,0,0]; return; }
+          let dx=na(coords[i][0]), dy=nb(coords[i][1]), dz=nc(coords[i][2]);
+          const len=Math.hypot(dx,dy,dz)||1;
+          const r=(1-o.cscore)*150+34;   // closest ~34 from centre, most distant ~184
+          o.pos=[ dx/len*r + jit(i,1)*14, dy/len*r + jit(i,2)*14, dz/len*r + jit(i,3)*14 ];
+        });
+      }
     } else {
       // LINEAR rhyme manifold: perfect rhymes at one end, distant echoes at the other
       scored.forEach((o,i)=>{
@@ -710,10 +936,19 @@ async function run(word){
     }
     buildScene(word,scored);
     applyModeChrome();
-    history.replaceState(null,'','?mode='+mode+'&word='+encodeURIComponent(word)); // shareable URL
+    // shareable URL (custom axes included so a copied link recreates the view)
+    let share='?mode='+mode+'&word='+encodeURIComponent(word);
+    if(mode==='meaning'){
+      const axv=id=>(document.getElementById(id).value||'').trim().toLowerCase();
+      const xa=axv('axXa'),xb=axv('axXb'),ya=axv('axYa'),yb=axv('axYb');
+      if(xa&&xb) share+='&ax='+encodeURIComponent(xa+','+xb);
+      if(ya&&yb) share+='&ay='+encodeURIComponent(ya+','+yb);
+    }
+    history.replaceState(null,'',share);
+    currentWord=word;
     document.getElementById('head-word').textContent=word;
     document.getElementById('head-count').textContent=scored.length+' words';
-    setStatus('Mapped '+scored.length+(mode==='rhyme'?' rhyming words':' related words')+'. Drag to explore — tap a word to leap there.');
+    setStatus('Mapped '+scored.length+(mode==='rhyme'?' rhyming words':' related words')+'. Drag to explore — tap any word to ask why, collect it, or map it.');
     document.getElementById('viewer-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
   }catch(err){
     console.error(err);
@@ -743,6 +978,7 @@ function setMode(newMode){
   const m=MODES[mode];
   wordInput.placeholder=m.placeholder;
   document.getElementById('field-label').innerHTML=m.fieldLabel;
+  document.getElementById('axesRow').classList.toggle('visible',mode==='meaning');
 }
 document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>{
   if(b.dataset.mode===mode) return;
@@ -756,10 +992,161 @@ document.getElementById('copylink').addEventListener('click',e=>{
   }).catch(()=>{ btn.textContent='Copy failed'; setTimeout(()=>btn.textContent=orig,1400); });
 });
 
+/* ---- readout actions: map / why / collect ---- */
+document.getElementById('ro-map').addEventListener('click',()=>{
+  if(roIdx<0) return;
+  const n=nodeData[roIdx];
+  wordInput.value=n.word; run(n.word);
+});
+const whyCache=new Map();
+document.getElementById('ro-why').addEventListener('click',async()=>{
+  if(roIdx<0) return;
+  const n=nodeData[roIdx]; if(!n||n.isQuery) return;
+  const el=document.getElementById('ro-whytext');
+  el.classList.add('show');
+  const key=mode+'|'+currentWord+'|'+n.word;
+  if(whyCache.has(key)){ el.textContent=whyCache.get(key); return; }
+  el.textContent='asking the word wizard…';
+  try{
+    const j=await wizard('/api/wordspace/explain',{mode,query:currentWord,word:n.word});
+    whyCache.set(key,j.reply); el.textContent=j.reply;
+  }catch(err){ el.textContent='The word wizard is snoozing — try again in a moment.'; }
+});
+document.getElementById('ro-collect').addEventListener('click',()=>{
+  if(roIdx<0) return; addToBasket(nodeData[roIdx].word);
+});
+
+/* ---- word basket & poem weaving ---- */
+const basket=[];
+const basketBar=document.getElementById('basketBar');
+function addToBasket(w){
+  if(!w||basket.includes(w)) return;
+  if(basket.length>=14){ setStatus('Basket is full — weave a poem or clear a few words first.',true); return; }
+  basket.push(w); renderBasket();
+}
+function renderBasket(){
+  const wrap=document.getElementById('basketChips');
+  wrap.innerHTML='';
+  basket.forEach(w=>{
+    const chip=document.createElement('span'); chip.className='basket-chip';
+    const b=document.createElement('b'); b.textContent=w;
+    const x=document.createElement('span'); x.className='x'; x.textContent='✕'; x.title='remove';
+    x.addEventListener('click',()=>{ basket.splice(basket.indexOf(w),1); renderBasket(); });
+    chip.append(b,x); wrap.appendChild(chip);
+  });
+  basketBar.classList.toggle('visible',basket.length>0);
+}
+document.getElementById('clearBasket').addEventListener('click',()=>{
+  basket.length=0; renderBasket();
+  document.getElementById('poemPanel').classList.remove('visible');
+});
+document.getElementById('weavePoem').addEventListener('click',async e=>{
+  const btn=e.currentTarget;
+  if(basket.length<2){ setStatus('Collect at least two words first — tap a word, then “＋ Collect”.',true); return; }
+  const orig=btn.textContent; btn.textContent='✎ Weaving…'; btn.disabled=true;
+  try{
+    const j=await wizard('/api/wordspace/poem',{mode,query:currentWord,words:basket.slice()});
+    document.getElementById('poemTitle').textContent=j.title||'Your poem';
+    document.getElementById('poemText').textContent=j.poem||'';
+    const panel=document.getElementById('poemPanel');
+    panel.classList.add('visible');
+    panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }catch(err){ setStatus('The word wizard is snoozing — try the poem again in a moment.',true); }
+  btn.textContent=orig; btn.disabled=false;
+});
+document.getElementById('copyPoem').addEventListener('click',e=>{
+  const btn=e.currentTarget;
+  const t=document.getElementById('poemTitle').textContent+'\n\n'+document.getElementById('poemText').textContent;
+  navigator.clipboard.writeText(t).then(()=>{ btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy poem',1400); }).catch(()=>{});
+});
+document.getElementById('closePoem').addEventListener('click',()=>document.getElementById('poemPanel').classList.remove('visible'));
+
+/* ---- export: save the constellation as a picture ---- */
+document.getElementById('savepng').addEventListener('click',()=>{
+  if(!nodeData.length) return;
+  renderer.render(scene,camera);            // fresh frame so toDataURL captures it
+  const src=renderer.domElement;
+  const W=src.width, H=src.height, scale=(W/stageWrap.clientWidth)||1;
+  const pad=Math.round(74*scale);
+  const c=document.createElement('canvas'); c.width=W; c.height=H+pad;
+  const g=c.getContext('2d');
+  g.fillStyle='#fcfcfe'; g.fillRect(0,0,W,H+pad);
+  g.drawImage(src,0,pad);
+  const proj=pos=>{ _v.set(pos[0],pos[1],pos[2]).project(camera); if(_v.z<-1||_v.z>1) return null; return [(_v.x*0.5+0.5)*W,(-_v.y*0.5+0.5)*H+pad]; };
+  // labels: query + strongest first, with the same overlap-skipping as on screen
+  const placed=[];
+  const idxs=[...nodeData.keys()].sort((a,b)=>((nodeData[b].isQuery?1:0)-(nodeData[a].isQuery?1:0))||(nodeData[b].score-nodeData[a].score));
+  g.textAlign='center';
+  for(const i of idxs){
+    const n=nodeData[i];
+    if(n.score<labelThreshold&&!n.isQuery) continue;
+    const p=proj(n.pos); if(!p) continue;
+    g.font=(n.isQuery?'700 ':'')+Math.round((n.isQuery?13:11)*scale)+"px 'Space Mono',monospace";
+    const tw=g.measureText(n.word).width, th=14*scale;
+    const box={x:p[0]-tw/2,y:p[1]-th*1.9,w:tw,h:th};
+    let overlap=false;
+    for(const b of placed){ if(box.x<b.x+b.w&&box.x+box.w>b.x&&box.y<b.y+b.h&&box.y+box.h>b.y){overlap=true;break;} }
+    if(overlap&&!n.isQuery) continue;
+    placed.push(box);
+    g.lineWidth=3*scale; g.strokeStyle='rgba(255,255,255,0.9)';
+    g.strokeText(n.word,p[0],p[1]-6*scale);
+    g.fillStyle=n.isQuery?'#6b6b9d':'#2a2a3a';
+    g.fillText(n.word,p[0],p[1]-6*scale);
+  }
+  poleObjs.forEach(lo=>{
+    const p=proj([lo.position.x,lo.position.y,lo.position.z]); if(!p) return;
+    const txt=lo.element.textContent.toUpperCase();
+    g.font='700 '+Math.round(12*scale)+"px 'Space Mono',monospace";
+    g.lineWidth=3*scale; g.strokeStyle='rgba(255,255,255,0.9)';
+    g.strokeText(txt,p[0],p[1]);
+    g.fillStyle='#d64a4a'; g.fillText(txt,p[0],p[1]);
+  });
+  g.textAlign='left';
+  g.fillStyle='#2a2a3a'; g.font='700 '+Math.round(20*scale)+"px 'Space Mono',monospace";
+  g.fillText('WORD SPACE — '+MODES[mode].prefix.toUpperCase()+' “'+currentWord.toUpperCase()+'”',Math.round(18*scale),Math.round(32*scale));
+  g.fillStyle='#8a8a9a'; g.font=Math.round(11*scale)+"px 'Space Mono',monospace";
+  g.fillText(nodeData.length+' words · wordspace.theuniversalsandpit.org',Math.round(18*scale),Math.round(54*scale));
+  const a=document.createElement('a');
+  a.download='word-space-'+currentWord+'-'+mode+'.png';
+  a.href=c.toDataURL('image/png');
+  a.click();
+});
+
+/* ---- print-friendly word list ---- */
+const escapeHTML=s=>(s||'').replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+document.getElementById('printlist').addEventListener('click',()=>{
+  if(!nodeData.length) return;
+  const m=MODES[mode];
+  const groups=m.legend.map(t=>({title:t,words:[]}));
+  nodeData.forEach(n=>{
+    if(n.isQuery) return;
+    let gi=m.bands.findIndex(b=>n.score>b); if(gi<0) gi=m.bands.length;
+    groups[gi].words.push(n);
+  });
+  let html='<h1>Word Space</h1><div class="pmeta">'+escapeHTML(m.prefix)+' “'+escapeHTML(currentWord)+'” · '
+    +nodeData.length+' words · '+new Date().toLocaleDateString()+' · wordspace.theuniversalsandpit.org</div>';
+  groups.forEach(gr=>{
+    if(!gr.words.length) return;
+    html+='<h2>'+escapeHTML(gr.title)+' ('+gr.words.length+')</h2>';
+    gr.words.forEach(n=>{
+      html+='<div class="pword"><strong>'+escapeHTML(n.word)+'</strong><span class="psub">'
+        +escapeHTML(n.sub||'')+' · '+Math.round(n.score*100)+'%</span></div>';
+    });
+  });
+  html+='<div class="pfoot">A Universal Sandpit experiment · rhyme &amp; word data: Datamuse · meaning: on-device MiniLM neural network</div>';
+  document.getElementById('printview').innerHTML=html;
+  window.print();
+});
+
 // ---- share links: open straight to a word + mode, and keep the URL in sync ----
 (function initFromURL(){
   const p=new URLSearchParams(location.search);
   const pm=p.get('mode'); if(pm) setMode(pm);
+  const setAx=(param,ida,idb)=>{
+    const v=(p.get(param)||'').split(',');
+    if(v.length===2&&v[0]&&v[1]){ document.getElementById(ida).value=v[0]; document.getElementById(idb).value=v[1]; }
+  };
+  setAx('ax','axXa','axXb'); setAx('ay','axYa','axYb');
   const pw=p.get('word'); if(pw){ wordInput.value=pw; run(pw); }
 })();
 
